@@ -1,15 +1,13 @@
 class ApartmentsController < ApplicationController
   def create
-    @user = current_user
-    @apartment = Apartment.new(params, user_id: @user)
-
-    respond_to do |format|
-      if @apartment.save!
-        format.json { render json: @apartment, status: :created }
+    if user_signed_in?
+      if apartment = current_user.apartments.create(apartment_params)
+        render json: @apartment, status: :created
       else
-        puts @apartment.errors
-        format.json { render json: @apartment.errors, status: :unprocessable_entity }
+        render json: @apartment.errors, status: :unprocessable_entity
       end
+    else
+      render json: {}, status: :forbidden
     end
   end
 
@@ -17,6 +15,6 @@ class ApartmentsController < ApplicationController
 
   def apartment_params
     params.require(:apartment)
-      .permit(:street, :city, :state, :manager, :email, :user)
+      .permit(:street, :city, :state, :manager, :email)
   end
 end
