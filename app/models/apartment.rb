@@ -18,4 +18,8 @@
 #
 class Apartment < ApplicationRecord
     belongs_to :user
+
+    def initialize(**params, user_id:)
+      params.merge(user_id: user.id)
+    end
 end
